@@ -1,50 +1,75 @@
-# Welcome to your Expo app 👋
+# QuietZone Frontend
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Expo Router app for QuietZone auth, zone management, and activity tracking.
 
-## Get started
+## Setup
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+1. Install dependencies:
 
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+2. Configure API URL:
 
-## Learn more
+```bash
+cp .env.example .env
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+Set `EXPO_PUBLIC_API_URL` to your backend, for example:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```env
+EXPO_PUBLIC_API_URL=http://127.0.0.1:4000
+```
 
-## Join the community
+3. Start app:
 
-Join our community of developers creating universal apps.
+```bash
+npm run web
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+For Android silent automation, use a dev build (not Expo Go):
+
+```bash
+npx expo prebuild --platform android
+npx expo run:android
+```
+
+## Reliability Gates
+
+Run before any beta build:
+
+```bash
+npm run lint
+npx tsc --noEmit
+```
+
+## Core v1 Behavior
+
+- Auth session restore with refresh fallback
+- Zone CRUD with map-based editor
+- Activity timeline
+- Manual transition logging from Activity tab (`Log enter` / `Log exit`)
+- Actionable retry states for API/network failures
+- Android zone-entry automation: geofence enter/exit detection with native silent/vibrate control
+
+## Android Silent Automation Setup
+
+1. Log in and create at least one active zone.
+2. Open Home tab > `Silent Automation`.
+3. Tap `Setup / Refresh automation`.
+4. Grant:
+   - Foreground location
+   - Background location
+   - Notification policy access (Do Not Disturb control)
+5. Leave app running/backgrounded and enter the zone.
+6. Verify Activity shows transition logs and mode-apply metadata.
+
+## Android Beta Checklist
+
+1. Confirm backend `/ready` is healthy.
+2. Set production/staging `EXPO_PUBLIC_API_URL`.
+3. Run lint + typecheck gates.
+4. Build Android beta artifact.
+5. Execute `docs/beta-smoke-checklist.md`.
+6. Share build with testers and collect issues with reproduction steps + request IDs.

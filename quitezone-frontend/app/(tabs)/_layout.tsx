@@ -1,33 +1,62 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { Redirect, Tabs } from "expo-router";
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { AuthLoadingScreen } from "@/components/ui/auth-loading-screen";
+import { Colors } from "@/constants/theme";
+import { useAuth } from "@/context/auth-context";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const colorScheme = useColorScheme() ?? "light";
+  const theme = Colors[colorScheme];
+  const { isAuthenticated, isHydrating } = useAuth();
+
+  if (isHydrating) {
+    return <AuthLoadingScreen />;
+  }
+
+  if (!isAuthenticated) {
+    return <Redirect href="/(auth)/welcome" />;
+  }
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
+        tabBarActiveTintColor: theme.tint,
+        tabBarInactiveTintColor: theme.tabIconDefault,
+        tabBarStyle: {
+          backgroundColor: theme.tabBar,
+          borderTopColor: theme.border,
+          height: 70,
+          paddingBottom: 8,
+          paddingTop: 8,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "700",
+        },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: "Home",
+          tabBarIcon: ({ color, size }) => <MaterialIcons color={color} name="home-filled" size={size} />,
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="zones"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: "Zones",
+          tabBarIcon: ({ color, size }) => <MaterialIcons color={color} name="place" size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="activity"
+        options={{
+          title: "Activity",
+          tabBarIcon: ({ color, size }) => <MaterialIcons color={color} name="history" size={size} />,
         }}
       />
     </Tabs>
